@@ -21,9 +21,9 @@ import {
   Raycaster,
   Vector2,
   Vector3,
-  CircleGeometry,
-  MeshBasicMaterial,
-  Mesh,
+  // CircleGeometry,
+  // MeshBasicMaterial,
+  // Mesh,
   AxesHelper,
   GridHelper,
   Plane,
@@ -32,6 +32,7 @@ import {
   Line,
   PointsMaterial,
   Points,
+  BufferAttribute,
   // Object3D,
   // BufferAttribute,
 } from "three";
@@ -40,6 +41,7 @@ import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js";
 const canvasRef = ref();
 const isDrawingLine = ref(false);
 const isDrawingCircle = ref(false);
+const isDrawingCircleMove = ref(false);
 const scene = new Scene();
 const points = [];
 const raycaster = new Raycaster();
@@ -95,10 +97,13 @@ function toggleDrawingModeCircle() {
   if (isDrawingCircle.value) {
     isDrawingCircle.value = false;
     window.removeEventListener("click", onMouseClickCircle);
+    window.removeEventListener("mousemove", onMouseMoveCircle);
+
     points.length = 0;
   } else {
     isDrawingCircle.value = true;
     isDrawingLine.value = false;
+    window.addEventListener("mousemove", onMouseMoveCircle);
     window.addEventListener("click", onMouseClickCircle);
     window.removeEventListener("click", onMouseClickLine);
     points.length = 0;
@@ -121,8 +126,85 @@ function onMouseClickLine(event) {
   }
 }
 
+function createLine(position) {
+  points.push(position.clone());
+
+  const pointGeometry = new BufferGeometry();
+  const pointPositions = new Float32Array([position.x, position.y, 0]);
+  pointGeometry.setAttribute("position", new BufferAttribute(pointPositions, 3));
+
+  const pointMaterial = new PointsMaterial({ color: 'green', size: 0.2 });
+  const centerPoint = new Points(pointGeometry, pointMaterial);
+  scene.add(centerPoint);
+
+  if (points.length === 2) {
+    const lineGeometry = new BufferGeometry().setFromPoints(points);
+    const lineMaterial = new LineBasicMaterial({ color: 'green' });
+    const line = new Line(lineGeometry, lineMaterial);
+    scene.add(line);
+    points.length = 0;
+  }
+}
+
+// function createCircle(position) {
+//   points.push(position.clone());
+
+//   if (points.length === 2) {
+//     const radius = points[0].distanceTo(points[1]);
+//     const center = points[0];
+//     const segments = 64;
+//     const angleStep = (Math.PI * 2) / segments;
+
+//     const positions = [];
+
+//     for (let segment = 0; segment <= segments; segment++) {
+//       const angle = angleStep * segment;
+//       const x = center.x + Math.cos(angle) * radius;
+//       const y = center.y + Math.sin(angle) * radius;
+
+//       positions.push(new Vector3(x, y, 0));
+//     }
+
+//     const geometry = new BufferGeometry().setFromPoints(positions);
+//     const material = new MeshBasicMaterial({ color: 0xff0000 });
+//     const circle = new Line(geometry, material);
+//     scene.add(circle);
+
+//     const pointGeometry = new BufferGeometry().setFromPoints([center]);
+//     const pointMaterial = new PointsMaterial({ color: 0xff0000, size: 0.2 });
+//     const centerPoint = new Points(pointGeometry, pointMaterial);
+//     circle.children.push(centerPoint);
+//     points.length = 0;
+//   }
+// }
+
+let currentCircle = null;
+const updatePoints = new Vector3();
+
 function onMouseClickCircle(event) {
   if (!isDrawingCircle.value) return;
+  if (event.target !== canvasRef.value) return;
+
+  if (points.length === 0) {
+    isDrawingCircleMove.value = true;
+  } else {
+    isDrawingCircleMove.value = false;
+  }
+
+  const rect = renderer.domElement.getBoundingClientRect();
+  mouse.x = ((event.clientX - rect.left) / rect.width) * 2 - 1;
+  mouse.y = -((event.clientY - rect.top) / rect.height) * 2 + 1;
+
+  raycaster.setFromCamera(mouse, camera);
+  const intersectionPoint = new Vector3();
+  if (raycaster.ray.intersectPlane(plane, intersectionPoint)) {
+    createCircle(intersectionPoint);
+  }
+}
+
+
+function onMouseMoveCircle(event) {
+  if (!isDrawingCircleMove.value) return;
   if (event.target !== canvasRef.value) return;
 
   const rect = renderer.domElement.getBoundingClientRect();
@@ -130,72 +212,72 @@ function onMouseClickCircle(event) {
   mouse.y = -((event.clientY - rect.top) / rect.height) * 2 + 1;
 
   raycaster.setFromCamera(mouse, camera);
-
   const intersectionPoint = new Vector3();
   if (raycaster.ray.intersectPlane(plane, intersectionPoint)) {
-    createCircle(intersectionPoint);
+    updateCircle(intersectionPoint);
   }
 }
 
-function createLine(position) {
-  points.push(position.clone());
-
-  const circleGeometry = new CircleGeometry(0.05, 32);
-  const circleMaterial = new MeshBasicMaterial({ color: 0xff0000, side: 2 });
-  const circle = new Mesh(circleGeometry, circleMaterial);
-
-  // const pointGeometry = new BufferGeometry().setFromPoints([position]);
-  // const pointMaterial = new PointsMaterial({ color: 0xff0000, side: 0.1});
-  // const centerPoint = new Points(pointGeometry, pointMaterial);
-
-  console.log("position: ", position.clone());
-
-
-  // centerPoint.position.copy(position);
-  circle.position.copy(position);
-  scene.add(circle);
-  // scene.add(centerPoint);
-
-
-  if (points.length === 2) {
-    const lineGeometry = new BufferGeometry().setFromPoints(points);
-    const lineMaterial = new LineBasicMaterial({ color: 0x0000ff });
-    const line = new Line(lineGeometry, lineMaterial);
-    scene.add(line);
-    points.length = 0;
-  }
-}
+const segments = 64;
 
 function createCircle(position) {
   points.push(position.clone());
 
-  if (points.length === 2) {
-    const radius = points[0].distanceTo(points[1]);
-    const center = points[0];
-    const segments = 64;
-    const angleStep = (Math.PI * 2) / segments;
+  if (points.length === 1) {
+    updatePoints.copy(position);
 
-    const positions = [];
-
-    for (let segment = 0; segment <= segments; segment++) {
-      const angle = angleStep * segment;
-      const x = center.x + Math.cos(angle) * radius;
-      const y = center.y + Math.sin(angle) * radius;
-
-      positions.push(new Vector3(x, y, 0));
-    }
-
-    const geometry = new BufferGeometry().setFromPoints(positions);
-    const material = new MeshBasicMaterial({ color: 0xff0000 });
-    const circle = new Line(geometry, material);
-    scene.add(circle);
-
-    const pointGeometry = new BufferGeometry().setFromPoints([center]);
+    // Create circle center
+    const pointGeometry = new BufferGeometry();
+    pointGeometry.setAttribute("position", new BufferAttribute(new Float32Array([position.x, position.y, 0]), 3));
     const pointMaterial = new PointsMaterial({ color: 0xff0000, size: 0.2 });
     const centerPoint = new Points(pointGeometry, pointMaterial);
-    circle.children.push(centerPoint);
+    scene.add(centerPoint);
+
+    //create circle
+    const geometry = new BufferGeometry();
+    const positions = new Float32Array((segments+1) * 3);
+    const positionAttribute = new BufferAttribute(positions, 3);
+    geometry.setAttribute("position", positionAttribute);
+    const material = new LineBasicMaterial({ color: 0xff0000 });
+    currentCircle = new Line(geometry, material);
+    scene.add(currentCircle);
+  }
+
+  if (points.length === 2) {
+    isDrawingCircleMove.value = false;
     points.length = 0;
   }
+}
+
+function updateCircle(position) {
+  if (!isDrawingCircleMove.value || points.length !== 1) return;
+
+  updatePoints.copy(position);
+  const radius = points[0].distanceTo(updatePoints);
+  const center = points[0];
+  const angleStep = (Math.PI * 2) / segments;
+
+  if (currentCircle) {
+    scene.remove(currentCircle);
+  }
+
+  const geometry = new BufferGeometry();
+  const positions = new Float32Array((segments + 1) * 3);
+  const positionAttribute = new BufferAttribute(positions, 3);
+
+  for (let segment = 0; segment <= segments; segment++) {
+    const angle = angleStep * segment;
+    positionAttribute.setXYZ(
+      segment,
+      center.x + Math.cos(angle) * radius,
+      center.y + Math.sin(angle) * radius,
+      0);
+  }
+
+  geometry.setAttribute("position", positionAttribute);
+  const material = new LineBasicMaterial({ color: 0xff0000 });
+  currentCircle = new Line(geometry, material);
+  scene.add(currentCircle);
 }
 
 
