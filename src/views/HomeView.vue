@@ -67,7 +67,7 @@ onMounted(() => {
   const axesHelper = new AxesHelper(6);
   scene.add(axesHelper);
 
-  const gridHelper = new GridHelper(10, 10);
+  const gridHelper = new GridHelper(11, 11);
   gridHelper.rotation.x = Math.PI / 2;
   scene.add(gridHelper);
 
@@ -115,6 +115,7 @@ function onMouseClickLine(event) {
   if (event.target !== canvasRef.value) return;
 
   const rect = renderer.domElement.getBoundingClientRect();
+
   mouse.x = ((event.clientX - rect.left) / rect.width) * 2 - 1;
   mouse.y = -((event.clientY - rect.top) / rect.height) * 2 + 1;
 
@@ -133,13 +134,13 @@ function createLine(position) {
   const pointPositions = new Float32Array([position.x, position.y, 0]);
   pointGeometry.setAttribute("position", new BufferAttribute(pointPositions, 3));
 
-  const pointMaterial = new PointsMaterial({ color: 'green', size: 0.2 });
+  const pointMaterial = new PointsMaterial({ color: "green", size: 0.2 });
   const centerPoint = new Points(pointGeometry, pointMaterial);
   scene.add(centerPoint);
 
   if (points.length === 2) {
     const lineGeometry = new BufferGeometry().setFromPoints(points);
-    const lineMaterial = new LineBasicMaterial({ color: 'green' });
+    const lineMaterial = new LineBasicMaterial({ color: "green" });
     const line = new Line(lineGeometry, lineMaterial);
     scene.add(line);
     points.length = 0;
@@ -178,7 +179,7 @@ function createLine(position) {
 //   }
 // }
 
-let currentCircle = null;
+let circle = null;
 const updatePoints = new Vector3();
 
 function onMouseClickCircle(event) {
@@ -202,7 +203,6 @@ function onMouseClickCircle(event) {
   }
 }
 
-
 function onMouseMoveCircle(event) {
   if (!isDrawingCircleMove.value) return;
   if (event.target !== canvasRef.value) return;
@@ -225,22 +225,25 @@ function createCircle(position) {
 
   if (points.length === 1) {
     updatePoints.copy(position);
-
-    // Create circle center
-    const pointGeometry = new BufferGeometry();
-    pointGeometry.setAttribute("position", new BufferAttribute(new Float32Array([position.x, position.y, 0]), 3));
-    const pointMaterial = new PointsMaterial({ color: 0xff0000, size: 0.2 });
-    const centerPoint = new Points(pointGeometry, pointMaterial);
-    scene.add(centerPoint);
-
     //create circle
     const geometry = new BufferGeometry();
-    const positions = new Float32Array((segments+1) * 3);
+    const positions = new Float32Array((segments + 1) * 3);
     const positionAttribute = new BufferAttribute(positions, 3);
     geometry.setAttribute("position", positionAttribute);
     const material = new LineBasicMaterial({ color: 0xff0000 });
-    currentCircle = new Line(geometry, material);
-    scene.add(currentCircle);
+    circle = new Line(geometry, material);
+    scene.add(circle);
+
+    // Create circle center
+    const pointGeometry = new BufferGeometry();
+    pointGeometry.setAttribute(
+      "position",
+      new BufferAttribute(new Float32Array([position.x, position.y, 0]), 3)
+    );
+    const pointMaterial = new PointsMaterial({ color: 0xff0000, size: 0.2 });
+    const centerPoint = new Points(pointGeometry, pointMaterial);
+    scene.add(centerPoint);
+    // circle.children.push(centerPoint);
   }
 
   if (points.length === 2) {
@@ -250,15 +253,13 @@ function createCircle(position) {
 }
 
 function updateCircle(position) {
-  if (!isDrawingCircleMove.value || points.length !== 1) return;
-
   updatePoints.copy(position);
   const radius = points[0].distanceTo(updatePoints);
   const center = points[0];
   const angleStep = (Math.PI * 2) / segments;
 
-  if (currentCircle) {
-    scene.remove(currentCircle);
+  if (circle) {
+    scene.remove(circle);
   }
 
   const geometry = new BufferGeometry();
@@ -271,15 +272,16 @@ function updateCircle(position) {
       segment,
       center.x + Math.cos(angle) * radius,
       center.y + Math.sin(angle) * radius,
-      0);
+      0
+    );
   }
 
   geometry.setAttribute("position", positionAttribute);
   const material = new LineBasicMaterial({ color: 0xff0000 });
-  currentCircle = new Line(geometry, material);
-  scene.add(currentCircle);
-}
+  circle = new Line(geometry, material);
+  scene.add(circle);
 
+}
 
 onUnmounted(() => {
   window.removeEventListener("click", onMouseClickLine);
