@@ -56,6 +56,7 @@ export function createCircle(position) {
   if (points.length === 2) {
     isDrawingCircleMove.value = false
     points.length = 0
+    currentCircle = null
   }
 }
 
@@ -67,11 +68,6 @@ export function updateCircle(position) {
   const center = points[0]
   const angleStep = (Math.PI * 2) / segments
 
-  if (currentCircle) {
-    scene.remove(currentCircle)
-  }
-
-  const geometry = new BufferGeometry()
   const positions = new Float32Array((segments + 1) * 3)
   const positionAttribute = new BufferAttribute(positions, 3)
 
@@ -85,8 +81,5 @@ export function updateCircle(position) {
     )
   }
 
-  geometry.setAttribute('position', positionAttribute)
-  const material = new LineBasicMaterial({ color: 0xff0000 })
-  currentCircle = new Line(geometry, material)
-  scene.add(currentCircle)
+  currentCircle.geometry.setAttribute('position', positionAttribute)
 }

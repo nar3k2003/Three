@@ -12,27 +12,19 @@
 </template>
 
 <script setup>
-import { ref, onMounted, onUnmounted } from "vue";
+import { ref, onMounted } from "vue";
 import { initScene } from "@/js/scene.js";
 import { toggleDrawingModeLine, isDrawingLine } from "@/js/line.js";
 import { toggleDrawingModeCircle, isDrawingCircle } from "@/js/circle.js";
-import { onMouseClickLine, onMouseClickCircle, onMouseMoveCircle } from "@/js/event.js";
+import { addClickEvent } from "@/js/event.js";
 
 const canvasRef = ref();
 
 onMounted(() => {
   initScene(canvasRef);
-
-  window.addEventListener("click", (event) => onMouseClickLine(event, canvasRef));
-  window.addEventListener("click", (event) => onMouseClickCircle(event, canvasRef));
-  window.addEventListener("mousemove", (event) => onMouseMoveCircle(event, canvasRef));
+  addClickEvent(canvasRef)
 });
 
-onUnmounted(() => {
-  window.removeEventListener("click", (event) => onMouseClickLine(event, canvasRef));
-  window.removeEventListener("click", (event) => onMouseClickCircle(event, canvasRef));
-  window.removeEventListener("mousemove", (event) => onMouseMoveCircle(event, canvasRef));
-});
 </script>
 
 <style scoped>
