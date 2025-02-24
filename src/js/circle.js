@@ -10,6 +10,7 @@ import {
 import { ref } from 'vue'
 import { scene } from './scene.js'
 import { isDrawingLine } from './line.js'
+import { isDrawingRectangle } from './rectangle.js'
 
 export const isDrawingCircle = ref(false)
 export const isDrawingCircleMove = ref(false)
@@ -24,6 +25,7 @@ export function toggleDrawingModeCircle() {
   } else {
     isDrawingCircle.value = true
     isDrawingLine.value = false
+    isDrawingRectangle.value = false
   }
 }
 
@@ -41,7 +43,6 @@ export function createCircle(position) {
     )
     const pointMaterial = new PointsMaterial({ color: 0xff0000, size: 0.2 })
     const centerPoint = new Points(pointGeometry, pointMaterial)
-    scene.add(centerPoint)
 
     const geometry = new BufferGeometry()
     const positions = new Float32Array((segments + 1) * 3)
@@ -51,6 +52,7 @@ export function createCircle(position) {
     const material = new LineBasicMaterial({ color: 0xff0000 })
     currentCircle = new Line(geometry, material)
     scene.add(currentCircle)
+    currentCircle.children.push(centerPoint)
   }
 
   if (points.length === 2) {

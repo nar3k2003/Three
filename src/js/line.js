@@ -10,6 +10,7 @@ import {
 import { ref } from 'vue'
 import { scene } from './scene.js'
 import { isDrawingCircle } from './circle.js'
+import { isDrawingRectangle } from './rectangle.js'
 
 export const isDrawingLine = ref(false)
 export const isDrawingLineMove = ref(false)
@@ -25,6 +26,7 @@ export function toggleDrawingModeLine() {
   } else {
     isDrawingLine.value = true
     isDrawingCircle.value = false
+    isDrawingRectangle.value = false
   }
 }
 
@@ -36,20 +38,12 @@ export function createLine(position) {
     const pointGeometry = new BufferGeometry()
     const startPointGeometry = new BufferGeometry()
 
-    startPointGeometry.setAttribute(
-      'position',
-      new BufferAttribute(new Float32Array([position.x, position.y, 0]), 3),
-    )
+    startPointGeometry.setFromPoints([new Vector3(position.x, position.y, 0)])
+    pointGeometry.setFromPoints([new Vector3(position.x, position.y, 0)])
 
-    pointGeometry.setAttribute(
-      'position',
-      new BufferAttribute(new Float32Array([position.x, position.y, 0]), 3),
-    )
     const pointMaterial = new PointsMaterial({ color: 'green', size: 0.2 })
     const startPoint = new Points(startPointGeometry, pointMaterial)
     endPoint = new Points(pointGeometry, pointMaterial)
-    scene.add(startPoint)
-    scene.add(endPoint)
 
     const geometry = new BufferGeometry()
     const positions = new Float32Array(3)
@@ -59,6 +53,8 @@ export function createLine(position) {
     const lineMaterial = new LineBasicMaterial({ color: 'green' })
     currentLine = new Line(geometry, lineMaterial)
     scene.add(currentLine)
+
+    currentLine.children.push(startPoint, endPoint)
   }
 
   if (points.length === 2) {
@@ -75,13 +71,9 @@ export function updateLine(position) {
   const positions = new Float32Array(6)
   const positionAttribute = new BufferAttribute(positions, 3)
 
-  const positionPoint = new Float32Array(3)
-  const positionPointAttribute = new BufferAttribute(positionPoint, 3)
-
   positionAttribute.setXYZ(0, points[0].x, points[0].y, 0)
   positionAttribute.setXYZ(1, updatePoints.x, updatePoints.y, 0)
-  positionPointAttribute.setXYZ(0, updatePoints.x, updatePoints.y, 0)
 
-  endPoint.geometry.setAttribute('position', positionPointAttribute)
+  endPoint.geometry.setAttribute('position', new BufferAttribute(new Float32Array([updatePoints.x, updatePoints.y, 0]), 3))
   currentLine.geometry.setAttribute('position', positionAttribute)
 }

@@ -7,6 +7,9 @@
     <button @click="toggleDrawingModeCircle">
       {{ isDrawingCircle ? "Stop Circle" : "Start Circle" }}
     </button>
+    <button @click="toggleDrawingModeRectangle">
+      {{ isDrawingRectangle ? "Stop Rectangle" : "Start Rectangle" }}
+    </button>
     <canvas ref="canvasRef"></canvas>
   </div>
 </template>
@@ -14,9 +17,10 @@
 <script setup>
 import { ref, onMounted } from "vue";
 import { initScene } from "@/js/scene.js";
-import { toggleDrawingModeLine, isDrawingLine } from "@/js/line.js";
-import { toggleDrawingModeCircle, isDrawingCircle } from "@/js/circle.js";
 import { addClickEvent } from "@/js/event.js";
+import { isDrawingCircle, toggleDrawingModeCircle } from "@/js/circle";
+import { isDrawingLine, toggleDrawingModeLine } from "@/js/line";
+import { isDrawingRectangle, toggleDrawingModeRectangle } from "@/js/rectangle";
 
 const canvasRef = ref();
 
