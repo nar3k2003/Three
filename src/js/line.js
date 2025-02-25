@@ -53,13 +53,19 @@ export function createLine(position) {
     const lineMaterial = new LineBasicMaterial({ color: 'green' })
     currentLine = new Line(geometry, lineMaterial)
     scene.add(currentLine)
+    currentLine.userData.type = 'line'
 
-    currentLine.children.push(startPoint, endPoint)
+    currentLine.add(startPoint, endPoint)
+    currentLine.children.forEach((children) => {
+      children.userData.parentType = 'line'
+    })
   }
 
   if (points.length === 2) {
     isDrawingLineMove.value = false
     points.length = 0
+    console.log("currentLine", currentLine);
+
     currentLine = null
   }
 }

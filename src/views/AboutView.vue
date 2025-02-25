@@ -10,6 +10,9 @@
     <button @click="toggleDrawingModeRectangle">
       {{ isDrawingRectangle ? "Stop Rectangle" : "Start Rectangle" }}
     </button>
+    <button @click="toggleSelectMode">
+      {{ isSelectMode ? "Stop Select mode" : "Start Select mode" }}
+    </button>
     <canvas ref="canvasRef"></canvas>
   </div>
 </template>
@@ -21,6 +24,7 @@ import { addClickEvent } from "@/js/event.js";
 import { isDrawingCircle, toggleDrawingModeCircle } from "@/js/circle";
 import { isDrawingLine, toggleDrawingModeLine } from "@/js/line";
 import { isDrawingRectangle, toggleDrawingModeRectangle } from "@/js/rectangle";
+import { isSelectMode, toggleSelectMode} from "@/js/select";
 
 const canvasRef = ref();
 

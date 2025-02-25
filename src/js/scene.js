@@ -5,6 +5,7 @@ import {
   AmbientLight,
   AxesHelper,
   GridHelper,
+  Color,
 } from 'three'
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
 
@@ -32,6 +33,8 @@ export function initScene(canvasRef) {
   const gridHelper = new GridHelper(11, 11)
   gridHelper.rotation.x = Math.PI / 2
   scene.add(gridHelper)
+
+  scene.background = new Color("white")
 
   function animate() {
     requestAnimationFrame(animate)

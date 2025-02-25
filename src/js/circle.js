@@ -15,6 +15,7 @@ import { isDrawingRectangle } from './rectangle.js'
 export const isDrawingCircle = ref(false)
 export const isDrawingCircleMove = ref(false)
 let currentCircle = null
+let centerPoint = null
 const points = []
 const updatePoints = new Vector3()
 const segments = 64
@@ -42,7 +43,7 @@ export function createCircle(position) {
       new BufferAttribute(new Float32Array([position.x, position.y, 0]), 3),
     )
     const pointMaterial = new PointsMaterial({ color: 0xff0000, size: 0.2 })
-    const centerPoint = new Points(pointGeometry, pointMaterial)
+    centerPoint = new Points(pointGeometry, pointMaterial)
 
     const geometry = new BufferGeometry()
     const positions = new Float32Array((segments + 1) * 3)
@@ -51,13 +52,17 @@ export function createCircle(position) {
 
     const material = new LineBasicMaterial({ color: 0xff0000 })
     currentCircle = new Line(geometry, material)
+    currentCircle.userData.type = 'circle'
     scene.add(currentCircle)
-    currentCircle.children.push(centerPoint)
+    currentCircle.add(centerPoint)
+    currentCircle.children[0].userData.parentType = 'circle'
   }
 
   if (points.length === 2) {
     isDrawingCircleMove.value = false
     points.length = 0
+    console.log("currentCircle", currentCircle);
+
     currentCircle = null
   }
 }
