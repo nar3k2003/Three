@@ -11,6 +11,7 @@ import { ref } from 'vue'
 import { scene } from './scene.js'
 import { isDrawingCircle } from './circle.js'
 import { isDrawingRectangle } from './rectangle.js'
+import { isHoverMode, isSelectMode } from './select.js'
 
 export const isDrawingLine = ref(false)
 export const isDrawingLineMove = ref(false)
@@ -27,6 +28,8 @@ export function toggleDrawingModeLine() {
     isDrawingLine.value = true
     isDrawingCircle.value = false
     isDrawingRectangle.value = false
+    isSelectMode.value = false
+    isHoverMode.value = false
   }
 }
 
@@ -41,16 +44,17 @@ export function createLine(position) {
     startPointGeometry.setFromPoints([new Vector3(position.x, position.y, 0)])
     pointGeometry.setFromPoints([new Vector3(position.x, position.y, 0)])
 
-    const pointMaterial = new PointsMaterial({ color: 'green', size: 0.2 })
+    const pointMaterial = new PointsMaterial({ color: 'black', size: 0.2 })
     const startPoint = new Points(startPointGeometry, pointMaterial)
     endPoint = new Points(pointGeometry, pointMaterial)
 
     const geometry = new BufferGeometry()
     const positions = new Float32Array(3)
+
     const positionAttribute = new BufferAttribute(positions, 3)
     geometry.setAttribute('position', positionAttribute)
 
-    const lineMaterial = new LineBasicMaterial({ color: 'green' })
+    const lineMaterial = new LineBasicMaterial({ color: 'black' })
     currentLine = new Line(geometry, lineMaterial)
     scene.add(currentLine)
     currentLine.userData.type = 'line'

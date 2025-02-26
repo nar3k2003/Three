@@ -3,28 +3,43 @@ import { createCircle, updateCircle, isDrawingCircle, isDrawingCircleMove } from
 import { createLine, updateLine, isDrawingLine, isDrawingLineMove } from './line.js'
 import { createRectangle, updateRectangle, isDrawingRectangle, isDrawingRectangleMove } from './rectangle.js'
 import { camera } from './scene.js'
+import { isSelectMode, selectMode, isHoverMode, hoverMode } from './select.js'
 
-export function addClickEvent(canvasRef) {
+export function addClickEvent(canvasRef, store) {
+  console.log("store: ", store.getters.getColor);
 
-  window.addEventListener('click', (event) => {
-    if (isDrawingLine.value){
-      onMouseClickLine(event, canvasRef)
+  window.addEventListener("click", (event) => {
+    if (isDrawingLine.value) {
+      onMouseClickLine(event, canvasRef);
     } else if (isDrawingCircle.value) {
-      onMouseClickCircle(event, canvasRef)
+      onMouseClickCircle(event, canvasRef);
     } else if (isDrawingRectangle.value) {
-      onMouseClickRectangle(event, canvasRef)
+      onMouseClickRectangle(event, canvasRef);
+    } else if (isSelectMode.value) {
+      onMouseClickSelect(event, canvasRef, store);
     }
-  })
+  });
 
-  window.addEventListener('mousemove', (event) => {
-    if (isDrawingLineMove.value){
-      onMouseMoveLine(event, canvasRef)
+  window.addEventListener("mousemove", (event) => {
+    if (isDrawingLineMove.value) {
+      onMouseMoveLine(event, canvasRef);
     } else if (isDrawingCircleMove.value) {
-      onMouseMoveCircle(event, canvasRef)
+      onMouseMoveCircle(event, canvasRef);
     } else if (isDrawingRectangleMove.value) {
-      onMouseMoveRectangle(event, canvasRef)
+      onMouseMoveRectangle(event, canvasRef);
+    } else if (isHoverMode.value) {
+      onMouseMoveSelect(event, canvasRef, store);
     }
-  })
+  });
+
+  window.addEventListener("keydown", (event) => {
+    if (event.key === "Escape") {
+      isDrawingLine.value = false;
+      isDrawingCircle.value = false;
+      isDrawingRectangle.value = false;
+      isSelectMode.value = true;
+    }
+  });
 }
 
 function onMouseClickLine(event, canvasRef) {
@@ -79,4 +94,18 @@ function onMouseMoveRectangle(event, canvasRef) {
 
   const intersectionPoint = getIntersectionPoint(event, canvasRef, camera)
   if (intersectionPoint) updateRectangle(intersectionPoint)
+}
+
+function onMouseClickSelect(event, canvasRef, store) {
+  if (!isSelectMode.value) return;
+  if (event.target !== canvasRef.value) return;
+
+  selectMode(event, canvasRef, store);
+}
+
+function onMouseMoveSelect(event, canvasRef, store) {
+  if (!isHoverMode.value) return;
+  if (event.target !== canvasRef.value) return;
+
+  hoverMode(event, canvasRef, store);
 }

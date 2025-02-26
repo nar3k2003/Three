@@ -14,8 +14,8 @@ export let camera, renderer, controls
 
 export function initScene(canvasRef) {
   const aspectRatio = 1000 / 600
-  camera = new PerspectiveCamera(45, aspectRatio, 0.1, 1000)
-  camera.position.set(0, 0, 15)
+  camera = new PerspectiveCamera(45, aspectRatio, 0.01, 1000)
+  camera.position.set(0, 0, 16)
   camera.lookAt(0, 0, 0)
 
   renderer = new WebGLRenderer({ canvas: canvasRef.value, antialias: true })
@@ -28,11 +28,11 @@ export function initScene(canvasRef) {
   scene.add(light)
 
   const axesHelper = new AxesHelper(6)
-  scene.add(axesHelper)
+  // scene.add(axesHelper)
 
-  const gridHelper = new GridHelper(11, 11)
+  const gridHelper = new GridHelper(12, 12)
   gridHelper.rotation.x = Math.PI / 2
-  scene.add(gridHelper)
+  // scene.add(gridHelper)
 
   scene.background = new Color("white")
 

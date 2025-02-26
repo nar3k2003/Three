@@ -8,7 +8,6 @@ export function getIntersectionPoint(event, canvasRef, camera) {
   const rect = canvasRef.value.getBoundingClientRect()
   mouse.x = ((event.clientX - rect.left) / rect.width) * 2 - 1
   mouse.y = -((event.clientY - rect.top) / rect.height) * 2 + 1
-
   raycaster.setFromCamera(mouse, camera)
   const intersectionPoint = new Vector3()
 
@@ -16,4 +15,12 @@ export function getIntersectionPoint(event, canvasRef, camera) {
     return intersectionPoint
   }
   return null
+}
+
+export function getIntersects(event, canvasRef, camera, scene) {
+  const rect = canvasRef.value.getBoundingClientRect()
+  mouse.x = ((event.clientX - rect.left) / rect.width) * 2 - 1
+  mouse.y = -((event.clientY - rect.top) / rect.height) * 2 + 1
+  raycaster.setFromCamera(mouse, camera)
+  return raycaster.intersectObjects(scene.children, true)
 }

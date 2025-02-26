@@ -1,17 +1,16 @@
 <template>
   <div>
-    <h1>Task 1</h1>
-    <button @click="toggleDrawingModeLine">
-      {{ isDrawingLine ? "Stop Line" : "Start Line" }}
+    <button @click="toggleDrawingModeLine" :class="{active: isDrawingLine}">
+      Line
     </button>
-    <button @click="toggleDrawingModeCircle">
-      {{ isDrawingCircle ? "Stop Circle" : "Start Circle" }}
+    <button @click="toggleDrawingModeCircle" :class="{active: isDrawingCircle}">
+      Circle
     </button>
-    <button @click="toggleDrawingModeRectangle">
-      {{ isDrawingRectangle ? "Stop Rectangle" : "Start Rectangle" }}
+    <button @click="toggleDrawingModeRectangle" :class="{active: isDrawingRectangle}">
+      Rectangle
     </button>
-    <button @click="toggleSelectMode">
-      {{ isSelectMode ? "Stop Select mode" : "Start Select mode" }}
+    <button @click="toggleSelectMode" :class="{active: isSelectMode}">
+      Select mode
     </button>
     <canvas ref="canvasRef"></canvas>
   </div>
@@ -28,9 +27,13 @@ import { isSelectMode, toggleSelectMode} from "@/js/select";
 
 const canvasRef = ref();
 
+import { useStore } from "vuex";
+const store = useStore();
+
+
 onMounted(() => {
   initScene(canvasRef);
-  addClickEvent(canvasRef)
+  addClickEvent(canvasRef, store);
 });
 
 </script>
@@ -38,5 +41,21 @@ onMounted(() => {
 <style scoped>
 canvas {
   display: block;
+  border: 1px solid rgb(145, 145, 145);
+}
+
+button {
+  margin: 5px;
+  padding: 5px;
+  border: 1px solid rgb(145, 145, 145);
+  background-color: white;
+  color: rgb(145, 145, 145);
+  cursor: pointer;
+}
+
+.active{
+  background-color: green;
+  color: white;
+
 }
 </style>
