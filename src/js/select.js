@@ -26,34 +26,7 @@ export function toggleSelectMode() {
   }
 }
 
-// export function hoverMode(event, canvasRef, store) {
-//   const origianlColor = store.state.select.color.originalColor;
-//   const hoverColor = store.state.select.color.hoverColor;
-
-//   if (!isHoverMode.value) return;
-
-//   const intersectionPoint = getIntersectionPoint(event, canvasRef, camera);
-//   if (!intersectionPoint) return;
-
-//   const intersects = getIntersects(event, canvasRef, camera, scene);
-//   console.log("intersectsH: ", intersects);
-
-//   if (intersects.length > 0) {
-//     for (let i = 0; i < intersects.length; i++) {
-//       const object = intersects[i].object;
-//         object.material.color.set(hoverColor);
-//         object.parent.material.color.set(hoverColor);
-//     }
-//   }else{
-//     for (let i = 0; i < scene.children.length; i++) {
-//       const object = scene.children[i];
-//         object.material.color.set(origianlColor);
-//         object.parent.material.color.set(origianlColor);
-//     }
-//   }
-// }
-
-let lastObject = null; 
+let lastObject = null;
 
 export function hoverMode(event, canvasRef, store) {
   const originalColor = store.state.select.color.originalColor;
@@ -111,26 +84,8 @@ export function selectMode(event, canvasRef, store) {
   console.log("scene: ", scene);
   console.log("store: ", store);
 
-
-  // if (intersects.length > 0) {
-  //   const object = intersects[0].object;
-  //   console.log("object: ",
-  //     object,
-  //     object.userData.type,
-  //     object.userData.parentType);
-
-
-  //   // if (!isValidObject(object)) return;
-
-  //   store.commit("selectObject", object);
-  //   object.material.color.set(store.state.select.color.clickColor);
-  // }
 }
 
-// function isValidObject(object) {
-//   return object.userData.type === "rectangle" ||
-//          object.userData.type === "circle" ||
-//          object.userData.type === "line";
-// }
+
 
 
