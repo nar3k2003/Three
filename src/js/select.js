@@ -34,22 +34,14 @@ export function hoverMode(event, canvasRef, store) {
 
   if (!isHoverMode.value) return;
 
-  const intersectionPoint = getIntersectionPoint(event, canvasRef, camera);
-  if (!intersectionPoint) return;
+  // const intersectionPoint = getIntersectionPoint(event, canvasRef, camera);
+  // if (!intersectionPoint) return;
 
   const intersects = getIntersects(event, canvasRef, camera, scene);
-  console.log("intersectsH: ", intersects);
+  // console.log("intersectsH: ", intersects);
 
   if (intersects.length > 0) {
     const object = intersects[0].object;
-    if (lastObject && lastObject !== object) {
-      if (lastObject.material) {
-        lastObject.material.color.set(originalColor);
-      }
-      if (lastObject.parent && lastObject.parent.material) {
-        lastObject.parent.material.color.set(originalColor);
-      }
-    }
 
     lastObject = object;
 
@@ -83,7 +75,6 @@ export function selectMode(event, canvasRef, store) {
   console.log("intersectsC: ", intersects);
   console.log("scene: ", scene);
   console.log("store: ", store);
-
 }
 
 

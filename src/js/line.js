@@ -55,12 +55,16 @@ export function createLine(position) {
     geometry.setAttribute('position', positionAttribute)
 
     const lineMaterial = new LineBasicMaterial({ color: 'black' })
+
     currentLine = new Line(geometry, lineMaterial)
-    scene.add(currentLine)
+    currentLine.name = 'line'
     currentLine.userData.type = 'line'
+
+    scene.add(currentLine)
 
     currentLine.add(startPoint, endPoint)
     currentLine.children.forEach((children) => {
+      children.name = 'line'
       children.userData.parentType = 'line'
     })
   }

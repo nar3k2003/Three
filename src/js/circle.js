@@ -12,6 +12,7 @@ import { scene } from './scene.js'
 import { isDrawingLine } from './line.js'
 import { isDrawingRectangle } from './rectangle.js'
 import { isHoverMode, isSelectMode } from './select.js'
+// import { addObjectToScene } from './scene.js'
 
 export const isDrawingCircle = ref(false)
 export const isDrawingCircleMove = ref(false)
@@ -47,7 +48,7 @@ export function createCircle(position) {
     )
     const pointMaterial = new PointsMaterial({ color: 'black', size: 0.2 })
     centerPoint = new Points(pointGeometry, pointMaterial)
-
+    // centerPoint.layers.set(1)
     const geometry = new BufferGeometry()
     const positions = new Float32Array((segments + 1) * 3)
     const positionAttribute = new BufferAttribute(positions, 3)
@@ -56,7 +57,10 @@ export function createCircle(position) {
     const material = new LineBasicMaterial({ color: 'black' })
     currentCircle = new Line(geometry, material)
     currentCircle.userData.type = 'circle'
+    // currentCircle.layers.set(1)
     scene.add(currentCircle)
+    // addObjectToScene(currentCircle)
+
     currentCircle.add(centerPoint)
     currentCircle.children[0].userData.parentType = 'circle'
   }
