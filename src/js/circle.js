@@ -24,12 +24,12 @@ const segments = 64
 export function toggleDrawingModeCircle() {
   if (isDrawingCircle.value) {
     isDrawingCircle.value = false
-  } else if (!isDrawingCircle.value) {
-    scene.children.forEach((child) => {
-      if (!child.userData.ready) {
+  } else {
+    [...scene.children].forEach((child) => {
+      if (!child.userData || !child.userData.ready) {
         scene.remove(child)
       }
-    })
+    });
     isDrawingCircle.value = true
     isDrawingLine.value = false
     isDrawingRectangle.value = false

@@ -22,12 +22,14 @@ let line = null
 export function toggleDrawingModeLine() {
   if (isDrawingLine.value) {
     isDrawingLine.value = false
-  } else if (!isDrawingLine.value) {
-      scene.children.forEach((child) => {
-        if (!child.userData.ready) {
-          scene.remove(child)
-        }
-      })
+  } else {
+    // Создаём копию массива `scene.children`, чтобы безопасно изменять оригинал
+    [...scene.children].forEach((child) => {
+      if (!child.userData || !child.userData.ready) {
+        scene.remove(child)
+      }
+    });
+
     isDrawingLine.value = true
     isDrawingCircle.value = false
     isDrawingRectangle.value = false
@@ -35,6 +37,8 @@ export function toggleDrawingModeLine() {
     isHoverMode.value = false
   }
 }
+
+
 
 export function createLine(position) {
   points.push(position.clone())

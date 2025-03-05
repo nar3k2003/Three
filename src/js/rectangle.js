@@ -15,11 +15,11 @@ export function toggleDrawingModeRectangle() {
   if (isDrawingRectangle.value) {
     isDrawingRectangle.value = false
   } else {
-    scene.children.forEach((child) => {
+    [...scene.children].forEach((child) => {
       if (!child.userData || !child.userData.ready) {
         scene.remove(child)
       }
-    })
+    });
     rectangles.length = 0
     isDrawingRectangle.value = true
     isDrawingLine.value = false
