@@ -12,6 +12,12 @@ const select = {
   },
   mutations: {
     selectObject(state, object) {
+      const exist = state.selectObjects.some((obj) => obj === object)
+      if (!exist){
+        state.selectObjects = [...state.selectObjects, object]
+      }
+    },
+    selectCtrlObject(state, object) {
       state.selectObjects.push(object)
     },
     deselectObject(state, object) {
@@ -22,7 +28,12 @@ const select = {
     },
   },
   getters: {
-    getColor: (state) => state.color,
+    getColor(state){
+      return state.color
+    },
+    selectedObject(state) {
+      return state.selectObjects
+    },
   },
 }
 

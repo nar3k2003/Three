@@ -12,11 +12,10 @@ import { scene } from './scene.js'
 import { isDrawingLine } from './line.js'
 import { isDrawingRectangle } from './rectangle.js'
 import { isHoverMode, isSelectMode } from './select.js'
-// import { addObjectToScene } from './scene.js'
 
 export const isDrawingCircle = ref(false)
 export const isDrawingCircleMove = ref(false)
-let currentCircle = null
+let circle = null
 let centerPoint = null
 const points = []
 const updatePoints = new Vector3()
@@ -25,7 +24,12 @@ const segments = 64
 export function toggleDrawingModeCircle() {
   if (isDrawingCircle.value) {
     isDrawingCircle.value = false
-  } else {
+  } else if (!isDrawingCircle.value) {
+    scene.children.forEach((child) => {
+      if (!child.userData.ready) {
+        scene.remove(child)
+      }
+    })
     isDrawingCircle.value = true
     isDrawingLine.value = false
     isDrawingRectangle.value = false
@@ -35,42 +39,43 @@ export function toggleDrawingModeCircle() {
 }
 
 export function createCircle(position) {
+  if (!isDrawingCircle.value) return
+
   points.push(position.clone())
 
   if (points.length === 1) {
     isDrawingCircleMove.value = true
-    updatePoints.copy(position)
 
-    const pointGeometry = new BufferGeometry()
-    pointGeometry.setAttribute(
-      'position',
-      new BufferAttribute(new Float32Array([position.x, position.y, 0]), 3),
-    )
-    const pointMaterial = new PointsMaterial({ color: 'black', size: 0.2 })
-    centerPoint = new Points(pointGeometry, pointMaterial)
-    // centerPoint.layers.set(1)
-    const geometry = new BufferGeometry()
-    const positions = new Float32Array((segments + 1) * 3)
-    const positionAttribute = new BufferAttribute(positions, 3)
-    geometry.setAttribute('position', positionAttribute)
+    const x1 = points[0].x,
+    y1 = points[0].y
 
-    const material = new LineBasicMaterial({ color: 'black' })
-    currentCircle = new Line(geometry, material)
-    currentCircle.userData.type = 'circle'
-    // currentCircle.layers.set(1)
-    scene.add(currentCircle)
-    // addObjectToScene(currentCircle)
+    circle = new Line(new BufferGeometry(), new LineBasicMaterial({ color: 'black' }))
 
-    currentCircle.add(centerPoint)
-    currentCircle.children[0].userData.parentType = 'circle'
+    centerPoint = new Points(new BufferGeometry(), new PointsMaterial({ color: 'black', size: 0.2 }))
+
+    centerPoint.geometry.setFromPoints([new Vector3(x1, y1, 0)])
+
+    const positionAttribute = new BufferAttribute(new Float32Array((segments + 1) * 3), 3)
+
+    circle.geometry.setAttribute('position', positionAttribute)
+
+    scene.add(circle)
+    circle.add(centerPoint)
+    console.log("scene: ", scene);
+
   }
 
   if (points.length === 2) {
     isDrawingCircleMove.value = false
+    circle.userData.type = 'circle'
+    circle.userData.isSelected = false
+    circle.children[0].userData.ready = true
+    circle.children[0].userData.parentType = 'circle'
+    circle.children[0].userData.isSelected = false
+    circle.userData.ready = true
+    console.log("circle: ", circle);
     points.length = 0
-    console.log("currentCircle", currentCircle);
-
-    currentCircle = null
+    circle = null
   }
 }
 
@@ -95,5 +100,9 @@ export function updateCircle(position) {
     )
   }
 
-  currentCircle.geometry.setAttribute('position', positionAttribute)
+  circle.geometry.setAttribute('position', positionAttribute)
+
+  circle.traverse((child) => {
+    child.geometry.computeBoundingSphere();
+  });
 }

@@ -4,11 +4,6 @@ import { scene } from './scene.js'
 import { isDrawingLine } from './line.js'
 import { isDrawingCircle } from './circle.js'
 import { isHoverMode, isSelectMode } from './select.js'
-// import { useStore } from 'vuex'
-
-// const store = useStore()
-// console.log("store: ", store.getters.getColor);
-
 
 export const isDrawingRectangle = ref(false)
 export const isDrawingRectangleMove = ref(false)
@@ -20,6 +15,12 @@ export function toggleDrawingModeRectangle() {
   if (isDrawingRectangle.value) {
     isDrawingRectangle.value = false
   } else {
+    scene.children.forEach((child) => {
+      if (!child.userData || !child.userData.ready) {
+        scene.remove(child)
+      }
+    })
+    rectangles.length = 0
     isDrawingRectangle.value = true
     isDrawingLine.value = false
     isDrawingCircle.value = false
@@ -29,6 +30,8 @@ export function toggleDrawingModeRectangle() {
 }
 
 export function createRectangle(position) {
+  if (!isDrawingRectangle.value) return
+
   points.push(position.clone())
 
   if (points.length === 1) {
@@ -37,24 +40,39 @@ export function createRectangle(position) {
     for (let i = 0; i < 4; i++) {
       rectangles[i] = new Line(new BufferGeometry(), new LineBasicMaterial({ color: 'black' }))
       scene.add(rectangles[i])
-      rectangles[i].userData.type = 'rectangle'
     }
+
     rectangles.forEach((line) => {
-      const linePoints = [
-        new Points(new BufferGeometry(), new PointsMaterial({ color: 'black', size: 0.2 })),
-        new Points(new BufferGeometry(), new PointsMaterial({ color: 'black', size: 0.2 })),
-      ]
-      line.add(...linePoints)
+      if (!line) return
+
+      const point1 = new Points(new BufferGeometry(), new PointsMaterial({ color: 'black', size: 0.2 }))
+      const point2 = new Points(new BufferGeometry(), new PointsMaterial({ color: 'black', size: 0.2 }))
+      point2.visible = false
+
+      line.add(point1, point2)
+
+      line.userData = { type: 'rectangle', isSelected: false, ready: false }
+
       line.children.forEach((point) => {
-        point.userData.parentType = 'rectangle'
+        point.userData = { parentType: 'rectangle', isSelected: false, ready: false }
       })
     })
   }
 
   if (points.length === 2) {
+    rectangles.forEach((line) => {
+      if (!line) return
+
+      line.userData.ready = true
+      line.name = 'rectangle'
+
+      line.children.forEach((point) => {
+        point.userData.ready = true
+      })
+    })
+
     isDrawingRectangleMove.value = false
     points.length = 0
-    console.log("rectangles: ", rectangles);
   }
 }
 
@@ -81,9 +99,23 @@ export function updateRectangle(position) {
   ]
 
   linePositions.forEach((linePoints, i) => {
+    if (!rectangles[i]) return
+
     rectangles[i].children.forEach((point, j) => {
-      point.geometry.setFromPoints([linePoints[j]])
+      if (point.geometry) {
+        point.geometry.setFromPoints([linePoints[j]])
+      }
     })
     rectangles[i].geometry.setFromPoints(linePoints)
+  })
+
+  rectangles.forEach((rectangle) => {
+    if (rectangle) {
+      rectangle.traverse((child) => {
+        if (child.geometry) {
+          child.geometry.computeBoundingSphere()
+        }
+      })
+    }
   })
 }
