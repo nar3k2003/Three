@@ -6,7 +6,6 @@ import { camera } from './scene.js'
 import { isSelectMode, selectMode, isHoverMode, hoverMode } from './select.js'
 
 export function addClickEvent(canvasRef, store) {
-  console.log("store: ", store.getters.getColor);
 
   window.addEventListener("click", (event) => {
     if (isDrawingLine.value) {

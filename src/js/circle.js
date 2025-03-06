@@ -61,7 +61,6 @@ export function createCircle(position) {
 
     scene.add(circle)
     circle.add(centerPoint)
-    console.log("scene: ", scene);
 
   }
 
@@ -73,7 +72,6 @@ export function createCircle(position) {
     circle.children[0].userData.parentType = 'circle'
     circle.children[0].userData.isSelected = false
     circle.userData.ready = true
-    console.log("circle: ", circle);
     points.length = 0
     circle = null
   }

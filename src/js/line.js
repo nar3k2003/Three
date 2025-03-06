@@ -56,8 +56,6 @@ export function createLine(position) {
 
     line.add(...linePoints)
     scene.add(line)
-    console.log("scene: ", scene);
-
   }
 
   if (points.length === 2) {
@@ -74,8 +72,6 @@ export function createLine(position) {
       children.userData.ready = true
     })
     points.length = 0
-    console.log("line: ", line);
-    console.log("scene: ", scene);
 
     line = null
   }

@@ -29,8 +29,6 @@ const store = useStore()
 watch(
   () => store.getters.selectedObject,
   (newValue, oldValue) => {
-    // console.log('newValue: ', newValue)
-    // console.log('oldValue: ', oldValue)
 
     if (newValue && newValue.length > 0) {
       const lastNewObject = newValue[newValue.length - 1]

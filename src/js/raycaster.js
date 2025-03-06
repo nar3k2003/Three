@@ -29,8 +29,6 @@ export function getIntersects(event, canvasRef, camera, scene) {
   raycaster.setFromCamera(mouse, camera)
 
   intersects = raycaster.intersectObjects(scene.children.filter(child => child.visible), true)
-  // console.log("intersects: ", intersects);
-  // console.log("scene: ", scene);
 
   return intersects
 }
