@@ -1,6 +1,5 @@
 import {
   BufferGeometry,
-  // BufferAttribute,
   LineBasicMaterial,
   Line,
   PointsMaterial,
@@ -23,7 +22,6 @@ export function toggleDrawingModeLine() {
   if (isDrawingLine.value) {
     isDrawingLine.value = false
   } else {
-    // Создаём копию массива `scene.children`, чтобы безопасно изменять оригинал
     [...scene.children].forEach((child) => {
       if (!child.userData || !child.userData.ready) {
         scene.remove(child)
@@ -37,8 +35,6 @@ export function toggleDrawingModeLine() {
     isHoverMode.value = false
   }
 }
-
-
 
 export function createLine(position) {
   points.push(position.clone())
